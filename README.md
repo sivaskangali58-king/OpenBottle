@@ -1,35 +1,104 @@
-# OpenBottle v0.8.7 — Tek oyun, tek kart
+<p align="center">
+  <img src="Assets/OpenBottleIcon.png" width="128" alt="OpenBottle simgesi">
+</p>
 
-Steam klasörlerindeki farklı `.exe` dosyalarını tek tek göstermek yerine **Oyunları Bul** artık bir kurulu oyun klasörü için tek kart önerir. Örneğin `The Guild - Europa 1410 Demo` için **Europa1410.exe** seçilir; `Europa1410-Win64-Shipping.exe` ayrı kart olarak listelenmez.
+<h1 align="center">OpenBottle</h1>
 
-Steam, The Guild, Wine Staging, GPTK, GPTK oyun şişeleri ve Steam siyah ekran düzeltmesi olduğu gibi kalır. **Şişeleri silmen veya oyunları tekrar indirmen gerekmez.**
+<p align="center">
+  Apple Silicon Mac'lerde Windows oyunlarını ve programlarını çalıştırmak için sade, Türkçe bir arayüz.<br>
+  Wine Staging ve Apple Game Porting Toolkit (GPTK) üzerine kurulu.
+</p>
 
-## MacBook'unda derleme
+<p align="center">
+  <img alt="Sürüm" src="https://img.shields.io/badge/s%C3%BCr%C3%BCm-0.8.9-blue">
+  <img alt="macOS" src="https://img.shields.io/badge/macOS-13%2B-black">
+  <img alt="Lisans" src="https://img.shields.io/badge/lisans-MIT-green">
+</p>
 
-1. Önce OpenBottle'ı kapat, ZIP dosyasını İndirilenler klasörüne çıkar.
-2. Terminal'de:
+---
+
+## Neler yapıyor?
+
+- **Şişeler:** Her program ya da oyun için ayrı bir Wine ortamı (prefix). Şişeler birbirini etkilemez.
+- **Steam desteği:** Steam, Wine Staging üzerinde çalışır. Steam'in siyah ekran sorununa karşı geri alınabilir bir onarım aracı var.
+- **DirectX 12 oyunlar:** Steam'in “Oyna” butonu DX12 oyunlarda hata verebiliyor. OpenBottle bu oyunları ayrı bir GPTK ortamında başlatır.
+- **Oyunları Bul:** Steam kütüphaneni tarar ve her oyun için tek bir kart gösterir. Gereksiz `.exe` listesi çıkmaz.
+- **Oyun kapakları:** Kartlarda oyunun gerçek Steam kapağı görünür, kapak bulunamazsa sade bir simge gösterilir.
+- **Türkçe ve sade arayüz:** Ana Sayfa, Kütüphane, Şişeler. Gelişmiş ayarlar ancak gerektiğinde karşına çıkar.
+
+## Gereksinimler
+
+| | |
+|---|---|
+| **Mac** | Apple Silicon (M1 ve sonrası) |
+| **macOS** | 13 Ventura veya daha yeni |
+| **Derlemek için** | Xcode veya Xcode Command Line Tools |
+| **Wine Staging** | Homebrew ile ya da `/Applications/Wine Staging.app` olarak kurulu olmalı |
+| **GPTK** (DX12 oyunlar için) | `/Applications/Game Porting Toolkit.app` konumunda olmalı |
+| **Rosetta 2** | Wine'ın çalışması için gerekli |
+
+> OpenBottle Wine, GPTK, D3DMetal ya da Steam'i **içinde getirmez**. Lisans gereği bunları kendin kurman gerekiyor; OpenBottle onları Mac'inde bulup kullanır.
+
+Steam siyah ekran onarımı ilk kez kullanıldığında Homebrew üzerinden `mingw-w64` kurmak isteyebilir. Bunu yapmadan önce senden onay ister.
+
+## Kurulum (kaynaktan derleme)
 
 ```bash
-cd ~/Downloads/OpenBottle-v0.8.7
-chmod +x scripts/build-macos.sh
+git clone https://github.com/sivaskangali58-king/OpenBottle.git
+cd OpenBottle
 ./scripts/build-macos.sh
 open dist/OpenBottle.app
 ```
 
-3. **Şişeler → Steam → Oyunları Bul** bölümünde The Guild tek satır görünmelidir.
-4. Kartı seçerek kütüphaneye ekleyebilirsin. Oyun başlatma GPTK üzerinden çalışmaya devam eder.
+Betik `dist/` klasörüne `OpenBottle.app` ile `OpenBottle-0.8.9.dmg` dosyalarını oluşturur. İstersen `.app`'i Uygulamalar klasörüne sürükleyebilirsin.
 
-## Teknik notlar
+### “Geliştirici doğrulanamadı” uyarısı
 
-- Oyun klasörleri `steamapps/common` altında aranır; her klasörden sıralama ile tek önerilen EXE seçilir.
-- Başlatıcı seçiminde oyun klasörünün kökündeki `.exe` tercih edilir. Bu her oyun için mükemmel seçim garantisi değildir; bazı oyunlar özel launcher ister.
-- Bir oyun zaten kütüphanedeyse ikinci EXE için tekrar önerilmez.
-- Daha önce eklediğin iki kısayol varsa otomatik silinmez; kullanıcı kaldırabilir. Oyun dosyalarına dokunulmaz.
-- 49 Swift çekirdek testi Linux üzerinde geçti. macOS SwiftUI uygulaması gerçek Mac üzerinde derlenip görsel olarak sınanmalıdır.
-- Orijinal kaynak ve üçüncü taraf lisans açıklamaları proje içinde korunmuştur.
+Uygulama Apple tarafından imzalanmadığı ve notarize edilmediği için macOS ilk açılışta uyarı verebilir. Uyarı çıkarsa:
 
-## v0.8.9 oyun kapakları
+1. **Sistem Ayarları → Gizlilik ve Güvenlik** bölümünü aç
+2. Sayfanın altındaki OpenBottle uyarısının yanında **Yine de Aç**'a bas
 
-Steam oyunları yerel `steamapps/appmanifest_<appid>.acf` dosyalarından eşleştirilir. Uygulama açıldığında (internet varsa) eksik kapaklar Steam'in genel CDN'inden indirilir ve `~/Library/Application Support/OpenBottle/Artwork/` klasörüne kaydedilir. Mevcut kütüphane kayıtları güncellenir; oyunlar yeniden indirilmez. The Guild: Europa 1410 Demo için Steam manifestinin eksik olması durumunda doğrulanmış AppID (4693080) yedek olarak kullanılır. Oyun kartındaki **… → Kapak görselini yenile** komutu elle yeniden dener. Steam'in resim sunucularına erişilemiyorsa kumanda simgesi gösterilir. Steam logoları ve kapak görselleri hak sahiplerine aittir; OpenBottle kaynak paketine eklenmez.
+## Test edilenler
 
-Arkadaşlara dağıtmak için macOS üzerinde `./scripts/build-macos.sh` komutunu çalıştırın. `dist/OpenBottle-0.8.9.dmg` oluşur. Paket ad-hoc imzalıdır, Apple tarafından notarize edilmemiştir. Kullanıcıların ayrıca Wine Staging, GPTK ve uyumlu diğer araçları kurması gerekebilir. Geniş dağıtım için Developer ID ile imzalama ve Apple notarization önerilir.
+Test makinesi MacBook Air M4 (16 GB):
+
+- ✅ Steam açılıyor (siyah ekran onarımıyla birlikte)
+- ✅ *The Guild – Europa 1410* demosu GPTK ile oynanabiliyor, düşük ayarlarda yaklaşık 25 FPS
+
+Oyun uyumluluğu ve performans oyundan oyuna çok değişir. Yüksek FPS beklentisiyle kurma; bu bir deneme projesi.
+
+## Verilerin nerede?
+
+Şişeler, Steam kurulumu, oyunlar ve kapak görselleri burada durur:
+
+```
+~/Library/Application Support/OpenBottle/
+```
+
+⚠️ Bu klasörü silersen **tüm şişelerin ve oyunların gider.** OpenBottle güncellemeleri bu klasöre dokunmaz.
+
+## Geliştirme
+
+```bash
+swift test
+```
+
+Proje yapısı:
+
+```
+Sources/OpenBottle/        SwiftUI arayüzü, Wine başlatıcı, Steam onarım ekranı
+Sources/OpenBottleCore/    Şişe modeli, kayıt, oyun tarama, Wine/GPTK bulma, Steam mantığı
+Tests/                     Çekirdek testleri ve betik testleri
+scripts/                   Derleme ve Steam onarım betikleri
+```
+
+Sürüm notları için [CHANGELOG.md](CHANGELOG.md) dosyasına bak.
+
+## Lisans ve teşekkür
+
+OpenBottle [MIT lisansı](LICENSE) ile dağıtılır.
+
+Steam siyah ekran onarımı fikri [notpop/steam-on-m1-wine](https://github.com/notpop/steam-on-m1-wine) projesinden esinlenmiştir. Ayrıntılar [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) dosyasında.
+
+Steam, Valve Corporation'ın ürünüdür. Game Porting Toolkit ve D3DMetal Apple'a aittir. OpenBottle; Valve, Apple veya CodeWeavers ile bağlantılı değildir ve onlar tarafından desteklenmez. Oyun kapakları ve logolar hak sahiplerine aittir.
